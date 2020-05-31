@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#define n 7 //pocet_riadkov
-#define m 7 //pocet_stlpcov
+#define n 7 //pocet_riadkov rows
+#define m 7 //pocet_stlpcov cols
 #define N 15
 #define ELEM(M,r,c) (M.elm[(M.cols)*r+c])
 
@@ -13,11 +13,81 @@ typedef struct {
 	float* elem;
 }MAT;
 
+/*prototyps*/
+void mat_generate_with_type(unsigned int rows, unsigned int cols);
+MAT* mat_create_with_type(unsigned int rows, unsigned int cols);
+MAT* mat_create_by_file(char* filename);
+char mat_save(MAT* mat, char* filename);
+void mat_destroy(MAT* mat);
+void mat_unit(MAT* mat);
+void mat_random(MAT* mat);
+void mat_print(MAT* mat);
+char mat_create_random_bistochastic(MAT* mat);
+
+//generuje maticu
+void mat_generate_with_type(unsigned int rows, unsigned int cols) {
+	int i;
+	float elem_matici;
+	FILE* fw = NULL;
+	if ((fw = fopen("matica.bin", "wb")) == NULL) {
+		printf("Subor matica.bin sa nepodarilo otvorit!\n");
+		return;
+	}
+	fwrite("M", sizeof(char), 1, fw);
+	fwrite("1", sizeof(char), 1, fw);
+	fwrite(&rows, sizeof(unsigned int), 1, fw);
+	fwrite(&cols, sizeof(unsigned int), 1, fw);
+	for (i = 0; i < n * m; i++) {
+		elem_matici = -10 + 20.0 * rand() / (double)(RAND_MAX + 1);
+		fwrite(&elem_matici, sizeof(float), 1, fw);
+	}
+	fclose(fw);
+	
+	
+	/*char ch, ch1;
+	int number, number2,j;
+	float fff;
+
+
+	FILE* input = NULL;
+	if ((input = fopen("matica.bin", "rb")) == NULL) {
+		printf("Subor matica.bin sa nepodarilo otvorit!\n");
+		return;
+	}
+
+	fread(&ch, sizeof(char), 1, input);
+	fread(&ch1, sizeof(char), 1, input);
+	fread(&number, sizeof(int), 1, input);
+	fread(&number2, sizeof(int), 1, input);
+	printf("%c %c %d %d\n", ch, ch1, number, number2);
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < m; j++) {
+			fread(&fff, sizeof(float), 1, input);
+			printf("%f\t", fff);
+		}
+		printf("\n");
+	}
+	fclose(input);
+	*/
+}
+
+
+MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
+	return (float*)malloc(sizeof(float)* rows_mat * cols_mat);
+}
+
+MAT* mat_create_by_file(char* filename) {
+
+}
+
 
 int main() {
 	srand((unsigned int)time(NULL));
 
-	printf("Hellow Fucking World");
+	MAT A;
+	//mat_create_with_type(n, m);
+	mat_generate_with_type(n, m);
+
 
 	getchar();
 	return 0;
