@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#define n 7 //pocet_riadkov rows
-#define m 7 //pocet_stlpcov cols
+#define n 3 //pocet_riadkov rows
+#define m 3 //pocet_stlpcov cols
 #define N 15
 #define ELEM(M,r,c) (M.elm[(M.cols)*r+c])
 
@@ -73,21 +73,74 @@ void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 
 
 MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
-	return (float*)malloc(sizeof(float)* rows_mat * cols_mat);
+	MAT M; 
+	M.rows = rows_mat;
+	M.cols = cols_mat;
+	M.elem = (float*)malloc(sizeof(float) * rows_mat * cols_mat);
+	if (M.elem == NULL)
+		return 1;
+	
+	return &M;
 }
 
-MAT* mat_create_by_file(char* filename) {
 
+MAT* mat_create_by_file(char* filename) {
+	FILE* fr = NULL;
+	unsigned int row_m, cols_m, i;
+	MAT* p_M;
+	float temp_elem;
+	float* p_temp_elem;
+
+	if ((fr = fopen(filename, "rb")) == NULL) {
+		printf("Subor matica.bin sa nepodarilo otvorit!\n");
+		return;
+	}
+
+	char ch[2];
+
+	fread(&ch[0], sizeof(char), 1, fr);
+	fread(&ch[1], sizeof(char), 1, fr);
+	fread(&row_m, sizeof(unsigned int), 1, fr);
+	fread(&cols_m, sizeof(unsigned int), 1, fr);
+
+	p_M = mat_create_with_type(row_m, cols_m);
+
+	p_temp_elem = p_M->elem;
+	for (i = 0; i < row_m * cols_m; i++) {
+		fread(&temp_elem, sizeof(float), 1, fr);
+		p_temp_elem[i] = temp_elem;
+	}
+
+	int j;
+
+	p_M->elem = p_temp_elem;
+
+	for (i = 0; i < row_m* cols_m; i++) {
+			printf("%f ", p_temp_elem[i]);
+		}
+
+	
+
+	//printf("%c %c %d %d\n", ch[0], ch[1], row_m, cols_m);
+
+	
+	fclose(fr);
 }
 
 
 int main() {
 	srand((unsigned int)time(NULL));
 
-	MAT A;
-	//mat_create_with_type(n, m);
-	mat_generate_with_type(n, m);
+	char filename[20] = "matica.bin";
+	char* p_filename;
 
+	p_filename = &filename;
+
+	//mat_generate_with_type(n, m);
+	
+	mat_create_by_file(p_filename);
+
+	//mat_create_with_type(n, m);
 
 	getchar();
 	return 0;
