@@ -4,7 +4,8 @@
 
 #define n 7 //pocet_riadkov
 #define m 7 //pocet_stlpcov
-#define N 15 
+#define N 15
+#define ELEM(M,r,c) (M.elm[(M.cols)*r+c])
 
 typedef struct {
 	unsigned int rows;
