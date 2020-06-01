@@ -42,19 +42,16 @@ void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 		fwrite(&elem_matici, sizeof(float), 1, fw);
 	}
 	fclose(fw);
-	
-	
+
+
 	/*char ch, ch1;
 	int number, number2,j;
 	float fff;
-
-
 	FILE* input = NULL;
 	if ((input = fopen("matica.bin", "rb")) == NULL) {
 		printf("Subor matica.bin sa nepodarilo otvorit!\n");
 		return;
 	}
-
 	fread(&ch, sizeof(char), 1, input);
 	fread(&ch1, sizeof(char), 1, input);
 	fread(&number, sizeof(int), 1, input);
@@ -73,13 +70,13 @@ void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 
 
 MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
-	MAT M; 
+	MAT M;
 	M.rows = rows_mat;
 	M.cols = cols_mat;
 	M.elem = (float*)malloc(sizeof(float) * rows_mat * cols_mat);
 	if (M.elem == NULL)
 		return 1;
-	
+
 	return &M;
 }
 
@@ -115,15 +112,15 @@ MAT* mat_create_by_file(char* filename) {
 
 	p_M->elem = p_temp_elem;
 
-	for (i = 0; i < row_m* cols_m; i++) {
-			printf("%f ", p_temp_elem[i]);
-		}
+	for (i = 0; i < row_m * cols_m; i++) {
+		printf("%f ", p_temp_elem[i]);
+	}
 
-	
+
 
 	//printf("%c %c %d %d\n", ch[0], ch[1], row_m, cols_m);
 
-	
+
 	fclose(fr);
 }
 
@@ -137,7 +134,7 @@ int main() {
 	p_filename = &filename;
 
 	//mat_generate_with_type(n, m);
-	
+
 	mat_create_by_file(p_filename);
 
 	//mat_create_with_type(n, m);
