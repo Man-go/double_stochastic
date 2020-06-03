@@ -182,6 +182,15 @@ void mat_unit(MAT* mat) {
 
 
 char mat_create_random_bistochastic(MAT* mat) {
+	int i, j;
+
+	for (i = 0; i < mat->rows; i++) {
+		for (j = 0; j < mat->cols; j++) {
+			if (ELEM(mat, i, j) < 0 || ELEM(mat, i, j) >= 1)
+				return 1;
+		}
+	}
+
 
 }
 
