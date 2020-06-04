@@ -24,8 +24,8 @@ void mat_random(MAT* mat); //Yes
 void mat_print(MAT* mat); //Yes
 char mat_create_random_bistochastic(MAT* mat); //Yes
 void mat_print_from_file(char* filename); //Yes
-void mat_generate_random_bistochastic(char* filename);
-void mix_array_of_permutation(unsigned int array_permutation, unsigned int dim);
+void mat_generate_random_bistochastic(char* filename); //Yes
+void mix_array_of_permutation(unsigned int array_permutation, unsigned int dim); //Yes
 
 //generuje maticu nejakou maticu a ulozi do souboru matica.bin
 void mat_generate_with_type(unsigned int rows, unsigned int cols) {
@@ -49,7 +49,6 @@ void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 
 //allocate and matrix nxm
 MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
-	//MAT M;
 	MAT* M = malloc(sizeof(unsigned int)*2 + 4);
 	M->rows = rows_mat;
 	M->cols = cols_mat;
@@ -69,6 +68,7 @@ char mat_save(MAT* mat, char* filename) {
 		printf("Subor %s sa nepodarilo otvorit!\n", filename);
 		return 1;
 	}
+
 	fwrite("M", sizeof(char), 1, fw);
 	fwrite("1", sizeof(char), 1, fw);
 	fwrite(&mat->rows, sizeof(unsigned int), 1, fw);
@@ -107,9 +107,7 @@ void mat_print_from_file(char* filename) {
 			printf("\n");
 	}
 
-
 	fclose(fr);
-
 }
 
 
@@ -166,7 +164,6 @@ void mix_array_of_permutation(unsigned int array_permutation[], unsigned int dim
 		array_permutation[i] = array_permutation[i + 1];
 	}
 	array_permutation[dim-1] = temp_element_of_permutation;
-
 }
 
 
@@ -256,7 +253,6 @@ char mat_create_random_bistochastic(MAT* mat) {
 
 	mat_print(mat);
 	
-
 	char bistoch_file_name[40] = "bistochastic_reduced_matrix.bin";
 	char* p_bistoch_file_name;
 	p_bistoch_file_name = &bistoch_file_name;
