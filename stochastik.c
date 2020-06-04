@@ -4,7 +4,7 @@
 
 #define n 3 //pocet_riadkov rows
 #define m 3 //pocet_stlpcov cols
-#define N 7
+#define Dim 4
 #define ELEM(M,r,c) (M->elem[(M->cols) * r + c])
 
 typedef struct {
@@ -22,10 +22,12 @@ void mat_destroy(MAT* mat); // Yes
 void mat_unit(MAT* mat);  //Yes
 void mat_random(MAT* mat); //Yes
 void mat_print(MAT* mat); //Yes
-char mat_create_random_bistochastic(MAT* mat);
+char mat_create_random_bistochastic(MAT* mat); //Yes
 void mat_print_from_file(char* filename); //Yes
+void mat_generate_random_bistochastic(char* filename);
+void mix_array_of_permutation(unsigned int array_permutation, unsigned int dim);
 
-//generuje maticu
+//generuje maticu nejakou maticu a ulozi do souboru matica.bin
 void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 	int i;
 	float elem_matici;
@@ -43,30 +45,6 @@ void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 		fwrite(&elem_matici, sizeof(float), 1, fw);
 	}
 	fclose(fw);
-
-
-	/*char ch, ch1;
-	int number, number2,j;
-	float fff;
-	FILE* input = NULL;
-	if ((input = fopen("matica.bin", "rb")) == NULL) {
-		printf("Subor matica.bin sa nepodarilo otvorit!\n");
-		return;
-	}
-	fread(&ch, sizeof(char), 1, input);
-	fread(&ch1, sizeof(char), 1, input);
-	fread(&number, sizeof(int), 1, input);
-	fread(&number2, sizeof(int), 1, input);
-	printf("%c %c %d %d\n", ch, ch1, number, number2);
-	for (i = 0; i < n; i++) {
-		for (j = 0; j < m; j++) {
-			fread(&fff, sizeof(float), 1, input);
-			printf("%f\t", fff);
-		}
-		printf("\n");
-	}
-	fclose(input);
-	*/
 }
 
 //allocate and matrix nxm
@@ -135,8 +113,7 @@ void mat_print_from_file(char* filename) {
 }
 
 
-//vypise maticu mat na obrazovku z memory
-//print on screen matrix from memory
+//vypise maticu mat na obrazovku z memory print on screen matrix from memory
 void mat_print(MAT* mat) {
 	int i;
 
@@ -164,8 +141,7 @@ void mat_random(MAT* mat) {
 }
 
 
-//inicializuje hustu maticu mat tak, aby vsetky mimodiagonalne
-//elementy boli nulove a vsetky diagonalne elementy jednotkove
+//inicializuje hustu maticu mat tak, aby vsetky mimodiagonalne elementy boli nulove a vsetky diagonalne elementy jednotkove
 void mat_unit(MAT* mat) {
 	int i,j;
 
@@ -179,27 +155,61 @@ void mat_unit(MAT* mat) {
 	}
 }
 
-//generuje randomnu bistochastic matrix
-void mat_generate_random_bistochastic(unsigned int dim) {
-	int i, temp_swap;
-	unsigned int permutac[N];
 
-	for (i = 0; i < dim; i++) {
-		permutac[i] = i+1;
+//change order of permutation 0312 -> 3120
+void mix_array_of_permutation(unsigned int array_permutation[], unsigned int dim) {
+	int i;
+	unsigned int temp_element_of_permutation;
+
+	temp_element_of_permutation = array_permutation[0];
+	for (i = 0; i < dim-1; i++) {
+		array_permutation[i] = array_permutation[i + 1];
+	}
+	array_permutation[dim-1] = temp_element_of_permutation;
+
+}
+
+
+//generuje randomnu bistochastic matrix
+void mat_generate_random_bistochastic(char* filename) {
+	int i, temp_swap, j, k;
+	unsigned int permutac[Dim];
+
+	float random_matrix_multiplikator;
+	MAT* p_Bistocastic_M;
+
+	p_Bistocastic_M = mat_create_with_type(Dim, Dim);
+
+	for (i = 0; i < Dim; i++) {
+		permutac[i] = i;
 	}
 
-	for (i = dim-1; i>=1; i--) {
+	for (i = Dim-1; i>=1; i--) {
 		int j = rand() % (i+1);
 		temp_swap = permutac[j];
 		permutac[j] = permutac[i];
 		permutac[i] = temp_swap;
 	}
 
-	for (i = 0; i < dim; i++) {
-
+	for (k = 0; k < Dim; k++) {
+		random_matrix_multiplikator = 1 + 99.0 * rand() / (double)(RAND_MAX + 1);
+		for (i = 0; i < Dim; i++) {
+			for (j = 0; j < Dim; j++) {
+				if (permutac[i] == j)
+					ELEM(p_Bistocastic_M, i, j) = random_matrix_multiplikator;
+			}
+		}
+		mix_array_of_permutation(permutac, Dim);
 	}
 
+	mat_save(p_Bistocastic_M, filename);
 
+	mat_print(p_Bistocastic_M);
+	printf("\n===========\n");
+
+	mat_create_random_bistochastic(p_Bistocastic_M);
+
+	mat_destroy(p_Bistocastic_M);
 }
 
 //upravi matricu na bistochasticku pokud je to mozne
@@ -214,9 +224,10 @@ char mat_create_random_bistochastic(MAT* mat) {
 	
 	for (i = 0; i < mat->rows; i++) {
 		for (j = 0; j < mat->cols; j++) {
-			if (ELEM(mat, i, j) < 0 || ELEM(mat, i, j) >= 1)
+			if (ELEM(mat, i, j) < 0) {
 				printf("Tenta matica nie bistochasticka");
 				return 1;
+			}
 		}
 	}
 
@@ -228,12 +239,13 @@ char mat_create_random_bistochastic(MAT* mat) {
 		for (j = 0; j < mat->cols; j++) {
 			sum_rows += ELEM(mat, i, j);
 			sum_cols += ELEM(mat, j, i);
-			printf("%f\t", ELEM(mat, j, i));
 		}
 		if (sum_rows != temp_sum || sum_cols != temp_sum) {
 			printf("Tenta matica nie bistochasticka");
 			return 1;
 		}
+		sum_rows = 0;
+		sum_cols = 0;
 	}
 
 	for (i = 0; i < mat->rows; i++) {
@@ -245,12 +257,13 @@ char mat_create_random_bistochastic(MAT* mat) {
 	mat_print(mat);
 	
 
-	char bistoch_file_name[40] = "matrix_bistochastic.bit";
+	char bistoch_file_name[40] = "bistochastic_reduced_matrix.bin";
 	char* p_bistoch_file_name;
 	p_bistoch_file_name = &bistoch_file_name;
 
 	mat_save(mat, bistoch_file_name);
 
+	printf("Ano! Matica Bistochasticka\n\n");
 	return 0;	
 }
 
@@ -283,8 +296,6 @@ MAT* mat_create_by_file(char* filename) {
 	mat_print_from_file(filename);
 
 	fclose(fr);
-
-	mat_create_random_bistochastic(p_M);
 }
 
 
@@ -294,16 +305,11 @@ MAT* mat_create_by_file(char* filename) {
 int main() {
 	srand((unsigned int)time(NULL));
 
-	char filename[20] = "matica.bin";
-	char* p_filename;
+	char filename_bistochastic[50] = "matica_bistochastic.bin";
+	char* p_filename_bistochastic;
+	p_filename_bistochastic = &filename_bistochastic;
 
-	p_filename = &filename;
-
-	mat_generate_random_bistochastic(7);
-
-	//mat_generate_with_type(n, m);
-
-	mat_create_by_file(p_filename);
+	mat_generate_random_bistochastic(p_filename_bistochastic);
 
 	getchar();
 	return 0;
