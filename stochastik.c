@@ -4,7 +4,7 @@
 
 #define n 3 //pocet_riadkov rows
 #define m 3 //pocet_stlpcov cols
-#define N 15
+#define N 7
 #define ELEM(M,r,c) (M->elem[(M->cols) * r + c])
 
 typedef struct {
@@ -179,19 +179,79 @@ void mat_unit(MAT* mat) {
 	}
 }
 
+//generuje randomnu bistochastic matrix
+void mat_generate_random_bistochastic(unsigned int dim) {
+	int i, temp_swap;
+	unsigned int permutac[N];
+
+	for (i = 0; i < dim; i++) {
+		permutac[i] = i+1;
+	}
+
+	for (i = dim-1; i>=1; i--) {
+		int j = rand() % (i+1);
+		temp_swap = permutac[j];
+		permutac[j] = permutac[i];
+		permutac[i] = temp_swap;
+	}
+
+	for (i = 0; i < dim; i++) {
+
+	}
 
 
+}
+
+//upravi matricu na bistochasticku pokud je to mozne
 char mat_create_random_bistochastic(MAT* mat) {
 	int i, j;
+	float temp_sum = 0, sum_rows = 0, sum_cols = 0;
 
+	if (mat->rows != mat->cols) {
+		printf("Tenta matica nie bistochasticka");
+		return 1;
+	}
+	
 	for (i = 0; i < mat->rows; i++) {
 		for (j = 0; j < mat->cols; j++) {
 			if (ELEM(mat, i, j) < 0 || ELEM(mat, i, j) >= 1)
+				printf("Tenta matica nie bistochasticka");
 				return 1;
 		}
 	}
 
+	for (j = 0; j < mat->cols; j++) {
+		temp_sum += ELEM(mat, 0, j);
+	}
 
+	for (i = 0; i < mat->rows; i++) {
+		for (j = 0; j < mat->cols; j++) {
+			sum_rows += ELEM(mat, i, j);
+			sum_cols += ELEM(mat, j, i);
+			printf("%f\t", ELEM(mat, j, i));
+		}
+		if (sum_rows != temp_sum || sum_cols != temp_sum) {
+			printf("Tenta matica nie bistochasticka");
+			return 1;
+		}
+	}
+
+	for (i = 0; i < mat->rows; i++) {
+		for (j = 0; j < mat->cols; j++) {
+			ELEM(mat, i, j) /= temp_sum;
+		}
+	}
+
+	mat_print(mat);
+	
+
+	char bistoch_file_name[40] = "matrix_bistochastic.bit";
+	char* p_bistoch_file_name;
+	p_bistoch_file_name = &bistoch_file_name;
+
+	mat_save(mat, bistoch_file_name);
+
+	return 0;	
 }
 
 //read matrix from file into memory
@@ -224,7 +284,7 @@ MAT* mat_create_by_file(char* filename) {
 
 	fclose(fr);
 
-	mat_unit(p_M);
+	mat_create_random_bistochastic(p_M);
 }
 
 
@@ -238,6 +298,8 @@ int main() {
 	char* p_filename;
 
 	p_filename = &filename;
+
+	mat_generate_random_bistochastic(7);
 
 	//mat_generate_with_type(n, m);
 
