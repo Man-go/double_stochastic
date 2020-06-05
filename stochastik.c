@@ -32,16 +32,16 @@ void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 	int i;
 	float elem_matici;
 	FILE* fw = NULL;
-	if ((fw = fopen("matica.bin", "wb")) == NULL)
+	if ((fw = open("matica.bin", "wb")) == NULL)
 		return NULL;
 	
-	fwrite("M", sizeof(char), 1, fw);
-	fwrite("1", sizeof(char), 1, fw);
-	fwrite(&rows, sizeof(unsigned int), 1, fw);
-	fwrite(&cols, sizeof(unsigned int), 1, fw);
+	write("M", sizeof(char), 1, fw);
+	write("1", sizeof(char), 1, fw);
+	write(&rows, sizeof(unsigned int), 1, fw);
+	write(&cols, sizeof(unsigned int), 1, fw);
 	for (i = 0; i < n * m; i++) {
 		elem_matici = -10 + 20.0 * rand() / (double)(RAND_MAX + 1);
-		fwrite(&elem_matici, sizeof(float), 1, fw);
+		write(&elem_matici, sizeof(float), 1, fw);
 	}
 	fclose(fw);
 }
