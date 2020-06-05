@@ -284,10 +284,6 @@ MAT* mat_create_by_file(char* filename) {
 	fclose(fr);
 }
 
-
-
-
-
 int main() {
 	srand((unsigned int)time(NULL));
 
