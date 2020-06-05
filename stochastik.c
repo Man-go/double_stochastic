@@ -49,7 +49,7 @@ void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 
 //allocate and matrix nxm
 MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
-	MAT* M = malloc(sizeof(unsigned int)*2 + 4);
+	MAT* M = malloc(sizeof(MAT));
 	M->rows = rows_mat;
 	M->cols = cols_mat;
 	M->elem = (float*)malloc(sizeof(float) * rows_mat * cols_mat);
