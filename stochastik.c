@@ -281,9 +281,6 @@ MAT* mat_create_by_file(char* filename) {
 		read(&temp_elem, sizeof(float), 1, fr);
 		p_M->elem [i] = temp_elem;
 	}
-
-	mat_print_from_file(filename);
-
 	fclose(fr);
 }
 
