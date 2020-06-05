@@ -88,18 +88,18 @@ void mat_print_from_file(char* filename) {
 	float temp_elem;
 	char ch[2];
 
-	if ((fr = fopen(filename, "rb")) == NULL) {
+	if ((fr = open(filename, "rb")) == NULL) {
 		return NULL;
 	}
 
-	fread(&ch[0], sizeof(char), 1, fr);
-	fread(&ch[1], sizeof(char), 1, fr);
-	fread(&rows, sizeof(int), 1, fr);
-	fread(&cols, sizeof(int), 1, fr);
+	read(&ch[0], sizeof(char), 1, fr);
+	read(&ch[1], sizeof(char), 1, fr);
+	read(&rows, sizeof(int), 1, fr);
+	read(&cols, sizeof(int), 1, fr);
 	printf("%c %c\n%d %d\n", ch[0], ch[1], rows, cols);
 
 	for (i = 0; i < rows * cols; i++) {
-		fread(&temp_elem, sizeof(float), 1, fr);
+		read(&temp_elem, sizeof(float), 1, fr);
 		printf("%f\t", temp_elem);
 		if (i % rows == rows - 1)
 			printf("\n");
@@ -264,21 +264,21 @@ MAT* mat_create_by_file(char* filename) {
 	MAT* p_M;
 	float temp_elem;
 
-	if ((fr = fopen(filename, "rb")) == NULL) {
+	if ((fr = open(filename, "rb")) == NULL) {
 		return NULL;
 	}
 
 	char ch[2];
 
-	fread(&ch[0], sizeof(char), 1, fr);
-	fread(&ch[1], sizeof(char), 1, fr);
-	fread(&row_m, sizeof(unsigned int), 1, fr);
-	fread(&cols_m, sizeof(unsigned int), 1, fr);
+	read(&ch[0], sizeof(char), 1, fr);
+	read(&ch[1], sizeof(char), 1, fr);
+	read(&row_m, sizeof(unsigned int), 1, fr);
+	read(&cols_m, sizeof(unsigned int), 1, fr);
 
 	p_M = mat_create_with_type(row_m, cols_m);
 
 	for (i = 0; i < row_m * cols_m; i++) {
-		fread(&temp_elem, sizeof(float), 1, fr);
+		read(&temp_elem, sizeof(float), 1, fr);
 		p_M->elem [i] = temp_elem;
 	}
 
