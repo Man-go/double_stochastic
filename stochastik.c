@@ -32,10 +32,9 @@ void mat_generate_with_type(unsigned int rows, unsigned int cols) {
 	int i;
 	float elem_matici;
 	FILE* fw = NULL;
-	if ((fw = fopen("matica.bin", "wb")) == NULL) {
-		printf("Subor matica.bin sa nepodarilo otvorit!\n");
-		return;
-	}
+	if ((fw = fopen("matica.bin", "wb")) == NULL)
+		return NULL;
+	
 	fwrite("M", sizeof(char), 1, fw);
 	fwrite("1", sizeof(char), 1, fw);
 	fwrite(&rows, sizeof(unsigned int), 1, fw);
@@ -53,9 +52,10 @@ MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
 	M->rows = rows_mat;
 	M->cols = cols_mat;
 	M->elem = (float*)malloc(sizeof(float) * rows_mat * cols_mat);
-	if (M->elem == NULL)
-		return 1;
-
+	if (M->elem == NULL) {
+		mat_destroy(M);
+		return NULL;
+	}
 	return M;
 }
 
@@ -65,8 +65,7 @@ char mat_save(MAT* mat, char* filename) {
 	float elem_matici;
 	FILE* fw = NULL;
 	if ((fw = fopen(filename, "wb")) == NULL) {
-		printf("Subor %s sa nepodarilo otvorit!\n", filename);
-		return 1;
+		return NULL;
 	}
 
 	fwrite("M", sizeof(char), 1, fw);
@@ -90,8 +89,7 @@ void mat_print_from_file(char* filename) {
 	char ch[2];
 
 	if ((fr = fopen(filename, "rb")) == NULL) {
-		printf("Subor %s sa nepodarilo otvorit!\n", filename);
-		return 1;
+		return NULL;
 	}
 
 	fread(&ch[0], sizeof(char), 1, fr);
@@ -214,23 +212,21 @@ char mat_create_random_bistochastic(MAT* mat) {
 	int i, j;
 	float temp_sum = 0, sum_rows = 0, sum_cols = 0;
 
-	if (mat->rows != mat->cols) {
-		printf("Tenta matica nie bistochasticka");
+	if (mat->rows != mat->cols)
 		return 1;
-	}
+	
 	
 	for (i = 0; i < mat->rows; i++) {
 		for (j = 0; j < mat->cols; j++) {
 			if (ELEM(mat, i, j) < 0) {
-				printf("Tenta matica nie bistochasticka");
 				return 1;
 			}
 		}
 	}
 
-	for (j = 0; j < mat->cols; j++) {
+	for (j = 0; j < mat->cols; j++) 
 		temp_sum += ELEM(mat, 0, j);
-	}
+	
 
 	for (i = 0; i < mat->rows; i++) {
 		for (j = 0; j < mat->cols; j++) {
@@ -238,7 +234,6 @@ char mat_create_random_bistochastic(MAT* mat) {
 			sum_cols += ELEM(mat, j, i);
 		}
 		if (sum_rows != temp_sum || sum_cols != temp_sum) {
-			printf("Tenta matica nie bistochasticka");
 			return 1;
 		}
 		sum_rows = 0;
@@ -259,7 +254,6 @@ char mat_create_random_bistochastic(MAT* mat) {
 
 	mat_save(mat, bistoch_file_name);
 
-	printf("Ano! Matica Bistochasticka\n\n");
 	return 0;	
 }
 
@@ -271,8 +265,7 @@ MAT* mat_create_by_file(char* filename) {
 	float temp_elem;
 
 	if ((fr = fopen(filename, "rb")) == NULL) {
-		printf("Subor %s sa nepodarilo otvorit!\n", filename);
-		return;
+		return NULL;
 	}
 
 	char ch[2];
