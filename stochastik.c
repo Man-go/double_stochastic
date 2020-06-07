@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <fcntl.h>
-//#include <io.h>
-//#include <unistd.h>
-
 
 
 #define ELEM(M,r,c) (M->elem[(M->cols) * r + c])
@@ -139,7 +136,6 @@ char mat_create_random_bistochastic(MAT* mat) {
 
 //read matrix from file into memory
 MAT* mat_create_by_file(char* filename) {
-	//FILE* fr = NULL;
 	int fr;
 	unsigned int rows_m = 0, cols_m = 0, i = 0;
 	MAT* p_M;
@@ -148,9 +144,6 @@ MAT* mat_create_by_file(char* filename) {
 	if ((fr = open(filename, O_RDONLY)) == -1) {
 		return NULL;
 	}
-	//if ((fr = open(filename, "rb")) == -1) {
-	//	return NULL;
-	//}
 
 	char ch[2] = {0};
 
