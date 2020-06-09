@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <fcntl.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 #include "prototype_s.h"
 
@@ -19,24 +19,20 @@ MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
 	return M;
 }
 
-//Save matrix from memory to file w noticed name
+//Save matrix from memory to file with noticed name
 char mat_save(MAT* mat, char* filename) {
+	int fw;
 	unsigned int i;
 	float elem_matici = 0;
-	FILE* fw = NULL;
-	if ((fw = fopen(filename, "wb")) == NULL) {
-		return 1;
+
+	if ((fw = open(filename, O_WRONLY)) == -1) {
+		return NULL;
 	}
 
-	fwrite("M", sizeof(char), 1, fw);
-	fwrite("1", sizeof(char), 1, fw);
-	fwrite(&mat->rows, sizeof(unsigned int), 1, fw);
-	fwrite(&mat->cols, sizeof(unsigned int), 1, fw);
-	
-	for (i = 0; i < mat->rows * mat->cols; i++) {
-		fwrite(&mat->elem [i], sizeof(float), 1, fw);
-	}
-	fclose(fw);
+	write(fw, "M1", 2*sizeof(char));
+	write(fw, &mat->rows, sizeof(unsigned int));
+	write(fw, &mat->cols, sizeof(unsigned int));
+	write(fw, mat->elem, mat->rows * mat->cols * sizeof(float));
 
 	return 0;
 }
@@ -53,7 +49,6 @@ void mat_print(MAT* mat) {
 	}
 }
 
-
 //free allocate memory
 void mat_destroy(MAT* mat) {
 	free(mat->elem);
@@ -69,7 +64,6 @@ void mat_random(MAT* mat) {
 	}
 }
 
-
 //inicializuje hustu maticu mat tak, aby vsetky mimodiagonalne elementy boli nulove a vsetky diagonalne elementy jednotkove
 void mat_unit(MAT* mat) {
 	unsigned int i,j;
@@ -83,7 +77,6 @@ void mat_unit(MAT* mat) {
 		}
 	}
 }
-
 
 //upravi matricu na bistochasticku pokud je to mozne
 char mat_create_random_bistochastic(MAT* mat) {
@@ -123,6 +116,7 @@ char mat_create_random_bistochastic(MAT* mat) {
 			ELEM(mat, i, j) /= temp_sum;
 		}
 	}
+
 	return 0;	
 }
 
@@ -151,8 +145,6 @@ MAT* mat_create_by_file(char* filename) {
 }
 
 int main() {
-
-
 	getchar();
 	return 0;
 }
