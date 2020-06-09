@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "prototype_s.h"
 
