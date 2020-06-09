@@ -3,15 +3,6 @@
 #include <limits.h>
 #include <fcntl.h>
 
-
-#define ELEM(M,r,c) (M->elem[(M->cols) * r + c])
-
-typedef struct {
-	unsigned int rows;
-	unsigned int cols;
-	float* elem;
-}MAT;
-
 #include "prototype_s.h"
 
 //allocate and matrix nxm
