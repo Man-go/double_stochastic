@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <time.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 #include "prototype_s.h"
 
@@ -120,7 +120,7 @@ void mix_array_of_permutation(unsigned int* array_permutation, unsigned int dim)
 
 //generuje randomnu bistochastic matrix
 char mat_create_random_bistochastic(MAT* mat) {
-	unsigned int i, temp_swap, j, k;
+	unsigned int i, j, k;
 	float sum_matrix_multiplikator = 0;
 
 	unsigned int* permutac;
@@ -151,12 +151,7 @@ char mat_create_random_bistochastic(MAT* mat) {
 		permutac[i] = i;
 	}
 
-	for (i = mat->rows - 1; i >= 1; i--) {
-		int j = rand() % (i + 1);
-		temp_swap = permutac[j];
-		permutac[j] = permutac[i];
-		permutac[i] = temp_swap;
-	}
+	mix_array_of_permutation(permutac, mat->rows);
 
 	for (k = 0; k < mat->rows; k++) {
 		for (i = 0; i < mat->rows; i++) {
