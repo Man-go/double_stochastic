@@ -14,3 +14,4 @@ void mat_unit(MAT* mat);
 void mat_random(MAT* mat);
 void mat_print(MAT* mat);
 char mat_create_random_bistochastic(MAT* mat);
+void mix_array_of_permutation(unsigned int array_permutation, unsigned int dim);

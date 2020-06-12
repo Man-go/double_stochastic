@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <fcntl.h>
-#include <unistd.h>
+#include <time.h>
+//#include <unistd.h>
 
 #include "prototype_s.h"
+
 
 //allocate and matrix nxm
 MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
@@ -22,7 +24,7 @@ MAT* mat_create_with_type(unsigned int rows_mat, unsigned int cols_mat) {
 //Save matrix from memory to file with noticed name
 char mat_save(MAT* mat, char* filename) {
 	int fw;
-	unsigned int i;
+	unsigned int i = 0;
 	float elem_matici = 0;
 
 	if ((fw = open(filename, O_WRONLY)) == -1) {
@@ -78,48 +80,6 @@ void mat_unit(MAT* mat) {
 	}
 }
 
-//upravi matricu na bistochasticku pokud je to mozne
-char mat_create_random_bistochastic(MAT* mat) {
-	unsigned int i, j;
-	float temp_sum = 0, sum_rows = 0, sum_cols = 0;
-
-	if (mat->rows != mat->cols)
-		return 1;
-	
-	
-	for (i = 0; i < mat->rows; i++) {
-		for (j = 0; j < mat->cols; j++) {
-			if (ELEM(mat, i, j) < 0) {
-				return 1;
-			}
-		}
-	}
-
-	for (j = 0; j < mat->cols; j++) 
-		temp_sum += ELEM(mat, 0, j);
-	
-
-	for (i = 0; i < mat->rows; i++) {
-		for (j = 0; j < mat->cols; j++) {
-			sum_rows += ELEM(mat, i, j);
-			sum_cols += ELEM(mat, j, i);
-		}
-		if (sum_rows != temp_sum || sum_cols != temp_sum) {
-			return 1;
-		}
-		sum_rows = 0;
-		sum_cols = 0;
-	}
-
-	for (i = 0; i < mat->rows; i++) {
-		for (j = 0; j < mat->cols; j++) {
-			ELEM(mat, i, j) /= temp_sum;
-		}
-	}
-
-	return 0;	
-}
-
 //read matrix from file into memory
 MAT* mat_create_by_file(char* filename) {
 	int fr;
@@ -144,7 +104,86 @@ MAT* mat_create_by_file(char* filename) {
 	return p_M;
 }
 
+
+//change order of permutation 0312 -> 3120
+void mix_array_of_permutation(unsigned int array_permutation[], unsigned int dim) {
+	unsigned int i;
+	unsigned int temp_element_of_permutation;
+
+	temp_element_of_permutation = array_permutation[0];
+	for (i = 0; i < dim - 1; i++) {
+		array_permutation[i] = array_permutation[i + 1];
+	}
+	array_permutation[dim - 1] = temp_element_of_permutation;
+}
+
+
+//generuje randomnu bistochastic matrix
+char mat_create_random_bistochastic(MAT* mat) {
+	unsigned int i, temp_swap, j, k;
+	float sum_matrix_multiplikator = 0;
+
+	unsigned int* permutac;
+	float* matrix_multiplikator;
+
+	if (mat->rows != mat->cols)
+		return 1;
+
+	permutac = malloc(sizeof(unsigned int) * mat->rows);
+	if (permutac == NULL)
+		return 1;
+
+	matrix_multiplikator = malloc(sizeof(float) * mat->rows);
+	if (matrix_multiplikator == NULL)
+		return 1;
+
+	for (i = 0; i < mat->rows; i++) {
+		matrix_multiplikator[i]= (float)(1 + 99.0 * rand() / (double)(RAND_MAX + 1));
+		sum_matrix_multiplikator += matrix_multiplikator[i];
+	}
+
+	for (i = 0; i < mat->rows; i++) {
+		matrix_multiplikator[i] /= sum_matrix_multiplikator;
+	}
+
+
+	for (i = 0; i < mat->rows; i++) {
+		permutac[i] = i;
+	}
+
+	for (i = mat->rows - 1; i >= 1; i--) {
+		int j = rand() % (i + 1);
+		temp_swap = permutac[j];
+		permutac[j] = permutac[i];
+		permutac[i] = temp_swap;
+	}
+
+	for (k = 0; k < mat->rows; k++) {
+		for (i = 0; i < mat->rows; i++) {
+			for (j = 0; j < mat->rows; j++) {
+				if (permutac[i] == j)
+					ELEM(mat, i, j) = matrix_multiplikator[k];
+			}
+		}
+		mix_array_of_permutation(permutac, mat->rows);
+	}
+
+	free(permutac);
+	free(matrix_multiplikator);
+	return 0;
+}
+
+
 int main() {
+	MAT* mat;
+	srand((unsigned int)time(NULL));
+
+	mat = mat_create_with_type(4, 4);
+
+	mat_create_random_bistochastic(mat);
+
+	mat_print(mat);
+
 	getchar();
 	return 0;
 }
