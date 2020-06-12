@@ -178,7 +178,7 @@ int main() {
 	MAT* mat;
 	srand((unsigned int)time(NULL));
 
-	mat = mat_create_with_type(4, 4);
+	mat = mat_create_with_type(7, 7);
 
 	mat_create_random_bistochastic(mat);
 
