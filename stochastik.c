@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <time.h>
-//#include <unistd.h>
+#include <unistd.h>
 
 #include "prototype_s.h"
 
@@ -106,7 +106,7 @@ MAT* mat_create_by_file(char* filename) {
 
 
 //change order of permutation 0312 -> 3120
-void mix_array_of_permutation(unsigned int array_permutation[], unsigned int dim) {
+void mix_array_of_permutation(unsigned int* array_permutation, unsigned int dim) {
 	unsigned int i;
 	unsigned int temp_element_of_permutation;
 
