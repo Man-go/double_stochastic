@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <time.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 #include "prototype_s.h"
 
@@ -120,7 +120,7 @@ void mix_array_of_permutation(unsigned int* array_permutation, unsigned int dim)
 
 //generuje randomnu bistochastic matrix
 char mat_create_random_bistochastic(MAT* mat) {
-	unsigned int i, j, k;
+	unsigned int i, j, k, temp_swap;
 	float sum_matrix_multiplikator = 0;
 
 	unsigned int* permutac;
@@ -134,8 +134,10 @@ char mat_create_random_bistochastic(MAT* mat) {
 		return 1;
 
 	matrix_multiplikator = malloc(sizeof(float) * mat->rows);
-	if (matrix_multiplikator == NULL)
+	if (matrix_multiplikator == NULL) {
+		free(permutac);
 		return 1;
+	}
 
 	for (i = 0; i < mat->rows; i++) {
 		matrix_multiplikator[i]= (float)(1 + 99.0 * rand() / (double)(RAND_MAX + 1));
@@ -151,7 +153,12 @@ char mat_create_random_bistochastic(MAT* mat) {
 		permutac[i] = i;
 	}
 
-	mix_array_of_permutation(permutac, mat->rows);
+	for (i = mat->rows - 1; i >= 1; i--) {
+		int j = rand() % (i + 1);
+		temp_swap = permutac[j];
+		permutac[j] = permutac[i];
+		permutac[i] = temp_swap;
+	}
 
 	for (k = 0; k < mat->rows; k++) {
 		for (i = 0; i < mat->rows; i++) {
@@ -173,7 +180,7 @@ int main() {
 	MAT* mat;
 	srand((unsigned int)time(NULL));
 
-	mat = mat_create_with_type(7, 7);
+	mat = mat_create_with_type(5, 5);
 
 	mat_create_random_bistochastic(mat);
 
