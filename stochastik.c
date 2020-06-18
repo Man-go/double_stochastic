@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <time.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 #include "prototype_s.h"
 
@@ -105,18 +105,21 @@ MAT* mat_create_by_file(char* filename) {
 }
 
 
-//change order of permutation 0312 -> 3120
 void mix_array_of_permutation(unsigned int* array_permutation, unsigned int dim) {
-	unsigned int i;
-	unsigned int temp_element_of_permutation;
+	unsigned int i, j, temp_swap;
 
-	temp_element_of_permutation = array_permutation[0];
-	for (i = 0; i < dim - 1; i++) {
-		array_permutation[i] = array_permutation[i + 1];
+	for (i = dim - 1; i >= 1; i--) {
+		int j = rand() % (i + 1);
+		temp_swap = array_permutation[j];
+		array_permutation[j] = array_permutation[i];
+		array_permutation[i] = temp_swap;
 	}
-	array_permutation[dim - 1] = temp_element_of_permutation;
-}
 
+	for (i = 0; i < dim; i++) {
+		printf("%d\t", array_permutation[i]);
+	}
+	printf("\n");
+}
 
 //generuje randomnu bistochastic matrix
 char mat_create_random_bistochastic(MAT* mat) {
@@ -129,43 +132,56 @@ char mat_create_random_bistochastic(MAT* mat) {
 	if (mat->rows != mat->cols)
 		return 1;
 
+	//allocate mamory for array of permutation
 	permutac = malloc(sizeof(unsigned int) * mat->rows);
 	if (permutac == NULL)
 		return 1;
-
+	
+	//allocate mamory for array of multiplicates
 	matrix_multiplikator = malloc(sizeof(float) * mat->rows);
 	if (matrix_multiplikator == NULL) {
 		free(permutac);
 		return 1;
 	}
 
+	//generate random positive multiplicators
 	for (i = 0; i < mat->rows; i++) {
-		matrix_multiplikator[i]= (float)(1 + 99.0 * rand() / (double)(RAND_MAX + 1));
+		//matrix_multiplikator[i]= (float)(1 + 99.0 * rand() / (double)(RAND_MAX + 1));
+		matrix_multiplikator[i] = (float)(1 +  rand()%10);
 		sum_matrix_multiplikator += matrix_multiplikator[i];
+		printf("%f\t", matrix_multiplikator[i]);
 	}
+	printf("\n");
 
-	for (i = 0; i < mat->rows; i++) {
+	//normalize array with multiplikators sum{n[i]} = 1
+	/*for (i = 0; i < mat->rows; i++) {
 		matrix_multiplikator[i] /= sum_matrix_multiplikator;
 	}
+	*/
 
-
+	//inicialaze array of permutation
 	for (i = 0; i < mat->rows; i++) {
 		permutac[i] = i;
 	}
 
-	for (i = mat->rows - 1; i >= 1; i--) {
-		int j = rand() % (i + 1);
-		temp_swap = permutac[j];
-		permutac[j] = permutac[i];
-		permutac[i] = temp_swap;
+	//zeroing of matrix elemets
+	for (i = 0; i < mat->rows; i++) {
+		for (j = 0; j < mat->rows; j++) {
+			ELEM(mat, i, j) = 0;
+		}
 	}
-
+	
+	mix_array_of_permutation(permutac, mat->rows); // first pemutation
+	
+	//generate bistochastic matrix
 	for (k = 0; k < mat->rows; k++) {
 		for (i = 0; i < mat->rows; i++) {
 			for (j = 0; j < mat->rows; j++) {
-				if (permutac[i] == j)
+				if (permutac[i] == j) 
 					ELEM(mat, i, j) = matrix_multiplikator[k];
+				printf("%f\t", ELEM(mat, i, j));
 			}
+			printf("\n");
 		}
 		mix_array_of_permutation(permutac, mat->rows);
 	}
@@ -180,7 +196,7 @@ int main() {
 	MAT* mat;
 	srand((unsigned int)time(NULL));
 
-	mat = mat_create_with_type(5, 5);
+	mat = mat_create_with_type(4, 4);
 
 	mat_create_random_bistochastic(mat);
 
