@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <time.h>
-//#include <unistd.h>
+#include <unistd.h>
 
 #include "prototype_s.h"
 
@@ -106,7 +106,7 @@ MAT* mat_create_by_file(char* filename) {
 
 
 void mix_array_of_permutation(unsigned int* array_permutation, unsigned int dim) {
-	unsigned int i, j, temp_swap;
+	unsigned int i, j=0, temp_swap;
 
 	for (i = dim - 1; i >= 1; i--) {
 		int j = rand() % (i + 1);
@@ -114,16 +114,11 @@ void mix_array_of_permutation(unsigned int* array_permutation, unsigned int dim)
 		array_permutation[j] = array_permutation[i];
 		array_permutation[i] = temp_swap;
 	}
-
-	for (i = 0; i < dim; i++) {
-		printf("%d\t", array_permutation[i]);
-	}
-	printf("\n");
 }
 
 //generuje randomnu bistochastic matrix
 char mat_create_random_bistochastic(MAT* mat) {
-	unsigned int i, j, k, temp_swap;
+	unsigned int i, j, k;
 	float sum_matrix_multiplikator = 0;
 
 	unsigned int* permutac;
@@ -146,18 +141,15 @@ char mat_create_random_bistochastic(MAT* mat) {
 
 	//generate random positive multiplicators
 	for (i = 0; i < mat->rows; i++) {
-		//matrix_multiplikator[i]= (float)(1 + 99.0 * rand() / (double)(RAND_MAX + 1));
-		matrix_multiplikator[i] = (float)(1 +  rand()%10);
+		matrix_multiplikator[i]= (float)(1 + 99.0 * rand() / (double)(RAND_MAX + 1));
 		sum_matrix_multiplikator += matrix_multiplikator[i];
-		printf("%f\t", matrix_multiplikator[i]);
 	}
-	printf("\n");
 
 	//normalize array with multiplikators sum{n[i]} = 1
-	/*for (i = 0; i < mat->rows; i++) {
+	for (i = 0; i < mat->rows; i++) {
 		matrix_multiplikator[i] /= sum_matrix_multiplikator;
 	}
-	*/
+	
 
 	//inicialaze array of permutation
 	for (i = 0; i < mat->rows; i++) {
@@ -171,19 +163,18 @@ char mat_create_random_bistochastic(MAT* mat) {
 		}
 	}
 	
-	mix_array_of_permutation(permutac, mat->rows); // first pemutation
+//	mix_array_of_permutation(permutac, mat->rows); // first pemutation
 	
 	//generate bistochastic matrix
 	for (k = 0; k < mat->rows; k++) {
+		mix_array_of_permutation(permutac, mat->rows);
 		for (i = 0; i < mat->rows; i++) {
 			for (j = 0; j < mat->rows; j++) {
 				if (permutac[i] == j) 
-					ELEM(mat, i, j) = matrix_multiplikator[k];
-				printf("%f\t", ELEM(mat, i, j));
+					ELEM(mat, i, j) += matrix_multiplikator[k];
 			}
-			printf("\n");
 		}
-		mix_array_of_permutation(permutac, mat->rows);
+		//mix_array_of_permutation(permutac, mat->rows);
 	}
 
 	free(permutac);
