@@ -109,7 +109,7 @@ void mix_array_of_permutation(unsigned int* array_permutation, unsigned int dim)
 	unsigned int i, j=0, temp_swap;
 
 	for (i = dim - 1; i >= 1; i--) {
-		int j = rand() % (i + 1);
+		int j = rand() % dim;
 		temp_swap = array_permutation[j];
 		array_permutation[j] = array_permutation[i];
 		array_permutation[i] = temp_swap;
