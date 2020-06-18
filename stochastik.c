@@ -163,8 +163,6 @@ char mat_create_random_bistochastic(MAT* mat) {
 		}
 	}
 	
-//	mix_array_of_permutation(permutac, mat->rows); // first pemutation
-	
 	//generate bistochastic matrix
 	for (k = 0; k < mat->rows; k++) {
 		mix_array_of_permutation(permutac, mat->rows);
@@ -174,7 +172,6 @@ char mat_create_random_bistochastic(MAT* mat) {
 					ELEM(mat, i, j) += matrix_multiplikator[k];
 			}
 		}
-		//mix_array_of_permutation(permutac, mat->rows);
 	}
 
 	free(permutac);
